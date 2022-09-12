@@ -6,6 +6,9 @@ import HighchartsReact from "highcharts-react-official";
 import useAxios from "../hooks/useAxios";
 
 const StoreChart = () => {
+  const { response: ethereum } = useAxios(
+    `/coins/ripple/market_chart?vs_currency=usd&days=90`
+  ); 
   const { response: ripple } = useAxios(
     `/coins/ripple/market_chart?vs_currency=usd&days=90`
   );
@@ -54,6 +57,10 @@ const StoreChart = () => {
     },
     series: [
       {
+        name: "ETH",
+        data: ethereum?.prices,
+      },
+      {
         name: "XRP",
         data: ripple?.prices,
       },
@@ -80,18 +87,3 @@ const StoreChart = () => {
 };
 
 export default StoreChart;
-
-// import Indicators from "highcharts/indicators/indicators-all.js";
-// import DragPanes from "highcharts/modules/drag-panes.js";
-// import AnnotationsAdvanced from "highcharts/modules/annotations-advanced.js";
-// import PriceIndicator from "highcharts/modules/price-indicator.js";
-// import FullScreen from "highcharts/modules/full-screen.js";
-// import StockTools from "highcharts/modules/stock-tools.js";
-
-// init the module
-// Indicators(Highcharts);
-// DragPanes(Highcharts);
-// AnnotationsAdvanced(Highcharts);
-// PriceIndicator(Highcharts);
-// FullScreen(Highcharts);
-// StockTools(Highcharts);
