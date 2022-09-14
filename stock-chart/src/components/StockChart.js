@@ -5,19 +5,49 @@ import HighchartsReact from "highcharts-react-official";
 
 import useAxios from "../hooks/useAxios";
 
+const getCryptoPrice = (crypto, coin) => {
+  let array ;
+  crypto.filter((element) => {
+    if (element.name === coin) {
+      const newElement = element.price;
+      const splitElement = newElement.split(",");
+      array = splitElement;
+    }
+  });
+  return array;
+};
+
+const crytpoDataToNum = (array) => {
+  let newArray = [];
+  array.forEach((str) => {
+    newArray.push(Number(str));
+  });
+  return newArray;
+}; 
+
+const multiDimensionalArray = (arr, size, newArray = []) => {
+  if (!arr.length) return newArray;
+  newArray.push(arr.slice(0, size));
+  return multiDimensionalArray(arr.slice(size), size, newArray);
+};
+
 const StoreChart = () => {
-  const { response: ethereum } = useAxios(
-    `/coins/ripple/market_chart?vs_currency=usd&days=90`
-  ); 
-  const { response: ripple } = useAxios(
-    `/coins/ripple/market_chart?vs_currency=usd&days=90`
-  );
-  const { response: cardano } = useAxios(
-    `/coins/cardano/market_chart?vs_currency=usd&days=90`
-  );
-  const { response: maticNetwork } = useAxios(
-    `/coins/matic-network/market_chart?vs_currency=usd&days=90`
-  );
+
+  const { response: cryptoData } = useAxios(`/cryptoData`)
+
+  const cardanoArray = getCryptoPrice(cryptoData, "cardano");
+  const maticNetworkArray = getCryptoPrice(cryptoData, "maticNetwork");
+  const rippleArray = getCryptoPrice(cryptoData, "ripple")
+
+
+  const cardanoArrayNum = crytpoDataToNum(cardanoArray);
+  const maticArrayNum = crytpoDataToNum(maticNetworkArray);
+  const rippleArrayNum = crytpoDataToNum(rippleArray);
+
+  const cardanoPriceData = multiDimensionalArray(cardanoArrayNum, 2)
+  const maticNetworkPriceData = multiDimensionalArray(maticArrayNum, 2);
+  const ripplePriceData = multiDimensionalArray(rippleArrayNum, 2);
+
 
   const options = {
     title: {
@@ -57,20 +87,16 @@ const StoreChart = () => {
     },
     series: [
       {
-        name: "ETH",
-        data: ethereum?.prices,
-      },
-      {
         name: "XRP",
-        data: ripple?.prices,
+        data: ripplePriceData,
       },
       {
         name: "ADA",
-        data: cardano?.prices,
+        data: cardanoPriceData,
       },
       {
         name: "MATIC",
-        data: maticNetwork?.prices,
+        data: maticNetworkPriceData,
       },
     ],
   };
