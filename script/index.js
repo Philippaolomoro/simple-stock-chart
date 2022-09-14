@@ -1,12 +1,8 @@
-const express = require("express");
-const routes = require("./route.js");
+const dotenv = require("dotenv").config()
+const http = require("http")
 
-const app = express();
+const app = require("./server.js")
 
-app.use(express.json());
-
-app.use("/api/v1", routes);
-
-const PORT = 5050;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => console.log(`App is running on ${PORT}...`));

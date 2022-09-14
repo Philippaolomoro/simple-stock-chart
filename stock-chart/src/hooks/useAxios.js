@@ -8,8 +8,6 @@ const useAxios = (param) => {
 
   axios.defaults.baseURL = "http://localhost:5050/api/v1";
 
-  // https://api.coingecko.com/api/v3
-
   const fetchData = async (param) => {
     try {
       setLoading(true);

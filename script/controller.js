@@ -2,6 +2,7 @@ const csv = require("fast-csv");
 const fs = require("fs");
 const { axiosUtil } = require("./axiosUtil");
 const path = require("path");
+const websocket = require("ws");
 
 exports.getData = async (req, res) => {
   try {
@@ -17,42 +18,43 @@ exports.getData = async (req, res) => {
         fs.mkdirSync("./public/files/export/", { recursive: true });
       }
     }
+      const writableStream = fs.createWriteStream(
+        "public/files/export/data.csv"
+      );
 
-    const writableStream = fs.createWriteStream("public/files/export/data.csv");
+      writableStream.on("error", function (err) {
+        console.log(err.message);
+      });
 
-    writableStream.on("error", function (err) {
-      console.log(err.message);
-    });
+      csvStream.pipe(writableStream);
 
-    csvStream.pipe(writableStream);
-
-    for (var key in cryptoData) {
-      if (cryptoData.hasOwnProperty(key)) {
-        csvStream.write({
-          name: key,
-          price: cryptoData[key].data.prices,
-        });
+      for (var key in cryptoData) {
+        if (cryptoData.hasOwnProperty(key)) {
+          csvStream.write({
+            name: key,
+            price: cryptoData[key].data.prices,
+          });
+        }
+        // await new Promise((resolve) => {
+        //   writableStream.once("drain", resolve);
+        // });
       }
-      // await new Promise((resolve) => {
-      //   writableStream.once("drain", resolve);
-      // });
-    }
 
-    csvStream.end();
-    writableStream.end();
+      csvStream.end();
+      writableStream.end();
 
-    // console.log(rows);
-    const options = {
-      root: path.join(__dirname)
-    }
-
-    const file = "public/files/export/data.csv"
-
-    return res.sendFile(file, options, (err)=> {
-      if(err) console.error(err)
-      console.log("File has been sent")
-    })
+    let rows = [];
+    fs.createReadStream("public/files/export/data.csv")
+      .pipe(csv.parse({ headers: true }))
+      .on("error", (error) => console.error(error))
+      .on("data", (row) => {
+        // console.log(row)
+        rows.push(row);
+      })
+      .on("end", () => {
+        res.send(rows);
+      });
   } catch (error) {
-    res.status(400).json(error.message);
+    res.status(400).json(error);
   }
 };
