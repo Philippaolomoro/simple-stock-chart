@@ -6,7 +6,8 @@ import HighchartsReact from "highcharts-react-official";
 import useAxios from "../hooks/useAxios";
 
 const getCryptoPrice = (crypto, coin) => {
-  let array ;
+  let array = [];
+  let newArray = [];
   crypto.filter((element) => {
     if (element.name === coin) {
       const newElement = element.price;
@@ -14,16 +15,12 @@ const getCryptoPrice = (crypto, coin) => {
       array = splitElement;
     }
   });
-  return array;
-};
-
-const crytpoDataToNum = (array) => {
-  let newArray = [];
-  array.forEach((str) => {
-    newArray.push(Number(str));
+  console.log(array.length);
+  array?.map((str) => {
+    newArray?.push(Number(str, 10));
   });
   return newArray;
-}; 
+};
 
 const multiDimensionalArray = (arr, size, newArray = []) => {
   if (!arr.length) return newArray;
@@ -31,23 +28,18 @@ const multiDimensionalArray = (arr, size, newArray = []) => {
   return multiDimensionalArray(arr.slice(size), size, newArray);
 };
 
+
 const StoreChart = () => {
 
   const { response: cryptoData } = useAxios(`/cryptoData`)
 
-  const cardanoArray = getCryptoPrice(cryptoData, "cardano");
-  const maticNetworkArray = getCryptoPrice(cryptoData, "maticNetwork");
-  const rippleArray = getCryptoPrice(cryptoData, "ripple")
+  const cardanoArrayData = getCryptoPrice(cryptoData, "cardano");
+  const maticArrayData = getCryptoPrice(cryptoData, "maticNetwork");
+  const rippleArrayData = getCryptoPrice(cryptoData, "ripple")
 
-
-  const cardanoArrayNum = crytpoDataToNum(cardanoArray);
-  const maticArrayNum = crytpoDataToNum(maticNetworkArray);
-  const rippleArrayNum = crytpoDataToNum(rippleArray);
-
-  const cardanoPriceData = multiDimensionalArray(cardanoArrayNum, 2)
-  const maticNetworkPriceData = multiDimensionalArray(maticArrayNum, 2);
-  const ripplePriceData = multiDimensionalArray(rippleArrayNum, 2);
-
+  const cardanoPriceData = multiDimensionalArray(cardanoArrayData, 2)
+  const maticPriceData = multiDimensionalArray(maticArrayData, 2);
+  const ripplePriceData = multiDimensionalArray(rippleArrayData, 2);
 
   const options = {
     title: {
@@ -96,7 +88,7 @@ const StoreChart = () => {
       },
       {
         name: "MATIC",
-        data: maticNetworkPriceData,
+        data: maticPriceData,
       },
     ],
   };
