@@ -1,5 +1,7 @@
 const axios = require("axios");
 
+// TODO add crypto api keys
+
 exports.axiosUtil = async () => {
   let list;
 
